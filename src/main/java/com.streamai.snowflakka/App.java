@@ -38,8 +38,8 @@ public class App
         routees.add("/user/clusterListener");
 
         ActorRef clusterListener = system.actorOf(Props.create(SimpleClusterListener.class), "clusterListener");
-        ActorRef clustRouter = system.actorOf(Props.create(ClusterRouter.class).withRouter(
-                new ClusterRouterConfig(new BroadcastRouter(2), new ClusterRouterSettings(10, "/user/clusterListener", true, "compute"))), "slaveRouter");
+        ActorRef clustRouter = system.actorOf(Props.create(ClusterRouterListener.class).withRouter(
+                new ClusterRouterConfig(new BroadcastRouter(10), new ClusterRouterSettings(100, "/user/clusterListener", true, "compute"))), "slaveRouter");
 
 
         //system.scheduler().schedule(new FiniteDuration(2, TimeUnit.SECONDS), new FiniteDuration(5, TimeUnit.SECONDS), clustRouter, "test 123", system.dispatcher(), null);
@@ -47,7 +47,7 @@ public class App
 
         ActorRef clientRouter = system.actorOf(Props.create(ClusterRouter.class).withRouter(
                 new ClusterRouterConfig(new AdaptiveLoadBalancingRouter(akka.cluster.routing.HeapMetricsSelector.getInstance(), 1),
-                        new ClusterRouterSettings(100, 10, true, null))
+                        new ClusterRouterSettings(10, 5, true, null))
         ));
         clientRouter.tell(new Broadcast("test client msg"), null);
         //system.scheduler().schedule(new FiniteDuration(2, TimeUnit.SECONDS), new FiniteDuration(5, TimeUnit.SECONDS), clientRouter, new Broadcast("test client msg"), system.dispatcher(), null);
